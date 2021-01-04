@@ -1,14 +1,12 @@
 
-import javax.accessibility.Accessible;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.swing.text.TextAction;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.ImageProducer;
 import java.io.IOException;
 import java.net.URL;
+import java.util.EventListener;
 import java.util.Random;
       /* @author Mihail Kolzlov
        *create by Mihail Kozlov 30.12.2020
@@ -41,7 +39,7 @@ public class GameWindow extends JFrame {
     }
     public static void main(String[] args) throws IOException {
        // SwingApp sw = new SwingApp();
-        SwingApp.createAndShowGUI();
+        SwingApp.switchMenu();
     }
 
 
@@ -129,76 +127,204 @@ public class GameWindow extends JFrame {
         }
     }
      // }
-     public static class SwingApp extends JFrame  {
+     public static class SwingApp extends JFrame {
+         private static String menuType = "A";
 
-         protected static void hide(JFrame panel){
-             panel.setState(Frame.ICONIFIED);
+         protected static void addComponentsToPanel(Container panel) {
+             panel.setLayout(null);
+
+             JButton quitButton = new JButton("Exit");
+             JButton scoreButton = new JButton("Score");
+             JButton startButton = new JButton("Start");
+             JButton settingButton = new JButton("Settings");
+             JButton creditButton = new JButton("Credit");
+             ActionListener st = new TestActionListener();
+             startButton.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                     GameField gameField = new GameField();
+                     try {
+                         if (isActive) {
+                         } else {
+                             panel1.setVisible(false);
+                             change();
+                             GameField.start(gameField);
+
+
+                         }
+                     } catch (IOException ioException) {
+                         ioException.printStackTrace();
+                     }
+                 }
+             });
+             quitButton.addActionListener(e -> System.exit(0));
+             scoreButton.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                     menuType = "B";
+                     try {
+                         switchMenu();
+                     } catch (IOException ioException) {
+                         ioException.printStackTrace();
+                     }
+                 }
+             });
+             creditButton.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                     menuType = "D";
+                     try {
+                         switchMenu();
+                     } catch (IOException ioException) {
+                         ioException.printStackTrace();
+                     }
+                 }
+             });
+             settingButton.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                     menuType = "C";
+                     try {
+                         switchMenu();
+                     } catch (IOException ioException) {
+                         ioException.printStackTrace();
+                     }
+                 }
+             });
+             startButton.setPreferredSize(new Dimension(100, 90));
+             Insets insets = panel.getInsets();
+             Dimension size = startButton.getPreferredSize();
+
+             startButton.setBounds(25 + insets.left, 20 + insets.top, size.width, size.height);
+             scoreButton.setBounds(175 + insets.left, 20 + insets.top, size.width, size.height);
+             settingButton.setBounds(25 + insets.left, 135 + insets.top, size.width, size.height);
+             creditButton.setBounds(175 + insets.left, 135 + insets.top, size.width, size.height);
+             quitButton.setBounds(25 + insets.left, 250 + insets.top, size.width + 150, size.height - 50);
+             panel.add(startButton);
+             panel.add(scoreButton);
+             panel.add(quitButton);
+             panel.add(settingButton);
+             panel.add(creditButton);
+             panel.setBackground(new Color(53, 53, 73));
+
          }
 
-        protected static void addComponentsToPanel(Container panel){
-            panel.setLayout(null);
-
-            JButton quitButton = new JButton("Exit");
-            JButton scoreButton = new JButton("Score");
-            JButton startButton = new JButton("Start");
-            JButton settingButton = new JButton("Settings");
-            JButton creditButton = new JButton("Credit");
-            ActionListener st = new TestActionListener();
-            startButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GameField gameField = new GameField();
-                    try {
-                        if(isActive){
-                        }else {
-                            panel1.setVisible(false);
-                            change();
-                            GameField.start(gameField);
+         protected static void createAndShowGUI() {
 
 
-                        }
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
-            });
-            quitButton.addActionListener(e -> System.exit(0));
-
-
-            startButton.setPreferredSize(new Dimension(100,90));
-            Insets insets = panel.getInsets();
-            Dimension size = startButton.getPreferredSize();
-
-            startButton.setBounds( 25 +insets.left, 20 + insets.top,size.width,size.height);
-            scoreButton.setBounds( 175 + insets.left , 20 + insets.top,size.width,size.height);
-            settingButton.setBounds(25 + insets.left, 135 + insets.top,size.width,size.height);
-            creditButton.setBounds(175 + insets.left, 135 + insets.top,size.width,size.height);
-            quitButton.setBounds(25 + insets.left, 250 + insets.top,size.width + 150,size.height -50);
-            panel.add(startButton);
-            panel.add(scoreButton);
-            panel.add(quitButton);
-            panel.add(settingButton);
-            panel.add(creditButton);
-            panel.setBackground(new Color( 53,53,73));
+             panel1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+             panel1.setResizable(false);
+             panel1.setVisible(true);
+             panel1.setLocation(800, 300);
+             //panel.setLocationRelativeTo();
+             addComponentsToPanel(panel1.getContentPane());
+             panel1.setSize(305, 340);
 
          }
-        protected static void createAndShowGUI() {
+
+         protected static void switchMenu() throws IOException {
+             switch (menuType) {
+                 case "A"://menu
+                     createAndShowGUI();
+                     break;
+                 case "B"://score
+                     panel1.getContentPane().removeAll();
+                     panel1.revalidate();
+                     panel1.repaint();
+                     showMenuB(panel1.getContentPane());
+                     break;
+                 case "C"://settings
+                     panel1.getContentPane().removeAll();
+                     panel1.revalidate();
+                     panel1.repaint();
+                     showMenuC(panel1.getContentPane());
+                     break;
+                 case "D"://credit
+                     panel1.getContentPane().removeAll();
+                     panel1.revalidate();
+                     panel1.repaint();
+                     showMenuD(panel1.getContentPane());
+
+                     break;
+
+             }
+         }
+
+         private static void showMenuB(Container panel) {
+             panel.setLayout(null);
+
+             JButton quitButton = new JButton("Back");
+             JButton scoreButton = new JButton("Score");
+             scoreButton.setPreferredSize(new Dimension(100, 90));
+             Insets insets = panel.getInsets();
+             Dimension size = scoreButton.getPreferredSize();
+             quitButton.setBounds(25 + insets.left, 250 + insets.top, size.width + 150, size.height - 50);
+             panel.add(scoreButton);
+             panel.add(quitButton);
+             ActionListener quit = new QuitActionListener();
+             quitButton.addActionListener(quit);
+//             quitButton.addActionListener(new ActionListener() {
+//                 @Override
+//                 public void actionPerformed(ActionEvent e) {
+//                     menuType = "A";
+//                     try {
+//                         panel1.getContentPane().removeAll();
+//                         panel1.revalidate();
+//                         panel1.repaint();
+//                         switchMenu();
+//                     } catch (IOException ioException) {
+//                         ioException.printStackTrace();
+//                     }
+//                 }
+//             });
+         }
 
 
-            panel1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            panel1.setResizable(false);
-            panel1.setVisible(true);
-            panel1.setLocation(800,300);
-            //panel.setLocationRelativeTo();
-            addComponentsToPanel(panel1.getContentPane());
-            panel1.setSize(305, 340);
+         private static void showMenuC(Container panel) {
+             panel.setLayout(null);
+
+             JButton quitButton = new JButton("Back");
+             JButton scoreButton = new JButton("Score");
+             scoreButton.setPreferredSize(new Dimension(100, 90));
+             Insets insets = panel.getInsets();
+             Dimension size = scoreButton.getPreferredSize();
+             quitButton.setBounds(25 + insets.left, 250 + insets.top, size.width + 150, size.height - 50);
+             panel.add(scoreButton);
+             panel.add(quitButton);
+             ActionListener quit = new QuitActionListener();
+             quitButton.addActionListener(quit);
+         }
+
+         private static void showMenuD(Container panel) {
+             panel.setLayout(null);
+
+             JButton quitButton = new JButton("Back");
+             JButton scoreButton = new JButton("Score");
+             scoreButton.setPreferredSize(new Dimension(100, 90));
+             Insets insets = panel.getInsets();
+             Dimension size = scoreButton.getPreferredSize();
+             quitButton.setBounds(25 + insets.left, 250 + insets.top, size.width + 150, size.height - 50);
+             panel.add(scoreButton);
+             panel.add(quitButton);
+             ActionListener quit = new QuitActionListener();
+             quitButton.addActionListener(quit);
 
          }
-        public SwingApp() throws IOException {
-             //ActionListener st  = new TestActionListener();
-            // startButton.addActionListener(st);
-         }
+         public static class QuitActionListener implements ActionListener{
 
+             @Override
+             public void actionPerformed(ActionEvent e) {
+                 menuType = "A";
+                 try {
+                     panel1.getContentPane().removeAll();
+                     panel1.revalidate();
+                     panel1.repaint();
+                     switchMenu();
+                 } catch (IOException ioException) {
+                     ioException.printStackTrace();
+                 }
+             }
+         }
      }
 
     private static class GameField extends JPanel{
