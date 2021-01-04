@@ -1,13 +1,11 @@
 
+import javax.accessibility.Accessible;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.text.TextAction;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.ImageProducer;
 import java.io.IOException;
 import java.net.URL;
@@ -25,15 +23,28 @@ public class GameWindow extends JFrame {
     private static Image gameOver;
     private static Image drop;
     private static Image start_Menu;
+    private static JFrame  panel1 = new JFrame();
     private static float drop_left = 400;
     private static float drop_top = -100;
     private static float drop_v = 200;
     private static float drop_vy = 200;
     private static int score = 0;
+    private static boolean isActive = false;
     private static int live = 3;
-    public static void main(String[] args) throws IOException {
-        new SwingApp();
+    public static void change(){
+        drop_left = 400;
+        drop_top = -100;
+        drop_v = 200;
+        drop_vy = 200;
+        score = 0;
+        live = 3;
     }
+    public static void main(String[] args) throws IOException {
+       // SwingApp sw = new SwingApp();
+        SwingApp.createAndShowGUI();
+    }
+
+
     private static void onRepaint(Graphics g) {
         long current_time = System.nanoTime();
         float drop_right = drop_left + drop.getWidth(null);
@@ -104,8 +115,13 @@ public class GameWindow extends JFrame {
         public void actionPerformed(ActionEvent e) {
             GameField gameField = new GameField();
             try {
-                GameField.start(gameField);
+                if(isActive){
+                }else {
+                    change();
+                    GameField.start(gameField);
 
+
+                }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -115,103 +131,77 @@ public class GameWindow extends JFrame {
      // }
      public static class SwingApp extends JFrame  {
 
-        public void createAndShowGUI(Container panel){
-             panel.setLayout(null);
-             panel.setBackground(new Color( 53,53,73));
-
-             JButton quitButton = new JButton("Exit");
-             JButton scoreButton = new JButton("Score");
-             JButton startButton = new JButton("Start");
-             JButton settingButton = new JButton("Settings");
-             JButton creditButton = new JButton("Credit");
-
-             quitButton.addActionListener(e -> System.exit(0));
-             setSize(305, 340);
-             quitButton.setPreferredSize(new Dimension(150,100));
-             setPreferredSize(new Dimension(100,90));
-             Insets insets = panel.getInsets();
-             Dimension size = getPreferredSize();
-             startButton.setBounds( 25 +insets.left, 20 + insets.top,size.width,size.height);
-             scoreButton.setBounds( 175 + insets.left , 20 + insets.top,size.width,size.height);
-             settingButton.setBounds(25 + insets.left, 135 + insets.top,size.width,size.height);
-             creditButton.setBounds(175 + insets.left, 135 + insets.top,size.width,size.height);
-             quitButton.setBounds(25 + insets.left, 250 + insets.top,size.width + 150,size.height -50);
-             panel.add(startButton);
-             panel.add(scoreButton);
-             panel.add(quitButton);
-             panel.add(settingButton);
-             panel.add(creditButton);
+         protected static void hide(JFrame panel){
+             panel.setState(Frame.ICONIFIED);
          }
-         public SwingApp() throws IOException {
-             JPanel panel = new JPanel();
-             panel.setLayout(null);
-             panel.setBackground(new Color( 53,53,73));
 
-             JButton quitButton = new JButton("Exit");
-             JButton scoreButton = new JButton("Score");
-             JButton startButton = new JButton("Start");
-             JButton settingButton = new JButton("Settings");
-             JButton creditButton = new JButton("Credit");
+        protected static void addComponentsToPanel(Container panel){
+            panel.setLayout(null);
 
-             quitButton.addActionListener(e -> System.exit(0));
-             setSize(305, 340);
-             quitButton.setPreferredSize(new Dimension(150,100));
-             setPreferredSize(new Dimension(100,90));
-             Insets insets = panel.getInsets();
-             Dimension size = getPreferredSize();
-             startButton.setBounds( 25 +insets.left, 20 + insets.top,size.width,size.height);
-             scoreButton.setBounds( 175 + insets.left , 20 + insets.top,size.width,size.height);
-             settingButton.setBounds(25 + insets.left, 135 + insets.top,size.width,size.height);
-             creditButton.setBounds(175 + insets.left, 135 + insets.top,size.width,size.height);
-             quitButton.setBounds(25 + insets.left, 250 + insets.top,size.width + 150,size.height -50);
-             panel.add(startButton);
-             panel.add(scoreButton);
-             panel.add(quitButton);
-             panel.add(settingButton);
-             panel.add(creditButton);
+            JButton quitButton = new JButton("Exit");
+            JButton scoreButton = new JButton("Score");
+            JButton startButton = new JButton("Start");
+            JButton settingButton = new JButton("Settings");
+            JButton creditButton = new JButton("Credit");
+            ActionListener st = new TestActionListener();
+            startButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    GameField gameField = new GameField();
+                    try {
+                        if(isActive){
+                        }else {
+                            panel1.setVisible(false);
+                            change();
+                            GameField.start(gameField);
 
-//             pane.setLayout(null);
-//
-//             JButton b1 = new JButton("one");
-//             JButton b2 = new JButton("two");
-//             JButton b3 = new JButton("three");
-//
-//             pane.add(b1);
-//             pane.add(b2);
-//             pane.add(b3);
-//
-//             Insets insets = pane.getInsets();
-//             Dimension size = b1.getPreferredSize();
-//             b1.setBounds(25 + insets.left, 5 + insets.top,
-//                     size.width, size.height);
-//             size = b2.getPreferredSize();
-//             b2.setBounds(55 + insets.left, 40 + insets.top,
-//                     size.width, size.height);
-//             size = b3.getPreferredSize();
-//             b3.setBounds(150 + insets.left, 15 + insets.top,
-//                     size.width + 50, size.height + 20);
-//
-//...//In the main method:
-//             Insets insets = frame.getInsets();
-//             frame.setSize(300 + insets.left + insets.right,
-//                     125 + insets.top + insets.bottom);
 
-             ActionListener st  = new TestActionListener();
-             startButton.addActionListener(st);
-             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+            });
+            quitButton.addActionListener(e -> System.exit(0));
 
-             getContentPane().add(panel);
-             //panel.setSize(600,600);
-             //panel.setLocation(500,500);
-             setResizable(false);
-             setPreferredSize(new Dimension(320, 100));
-             setLocationRelativeTo(null);
-             setVisible(true);
+
+            startButton.setPreferredSize(new Dimension(100,90));
+            Insets insets = panel.getInsets();
+            Dimension size = startButton.getPreferredSize();
+
+            startButton.setBounds( 25 +insets.left, 20 + insets.top,size.width,size.height);
+            scoreButton.setBounds( 175 + insets.left , 20 + insets.top,size.width,size.height);
+            settingButton.setBounds(25 + insets.left, 135 + insets.top,size.width,size.height);
+            creditButton.setBounds(175 + insets.left, 135 + insets.top,size.width,size.height);
+            quitButton.setBounds(25 + insets.left, 250 + insets.top,size.width + 150,size.height -50);
+            panel.add(startButton);
+            panel.add(scoreButton);
+            panel.add(quitButton);
+            panel.add(settingButton);
+            panel.add(creditButton);
+            panel.setBackground(new Color( 53,53,73));
+
+         }
+        protected static void createAndShowGUI() {
+
+
+            panel1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            panel1.setResizable(false);
+            panel1.setVisible(true);
+            panel1.setLocation(800,300);
+            //panel.setLocationRelativeTo();
+            addComponentsToPanel(panel1.getContentPane());
+            panel1.setSize(305, 340);
+
+         }
+        public SwingApp() throws IOException {
+             //ActionListener st  = new TestActionListener();
+            // startButton.addActionListener(st);
          }
 
      }
 
-    private static class GameField extends JPanel {
+    private static class GameField extends JPanel{
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -223,37 +213,65 @@ public class GameWindow extends JFrame {
             onRepaint(g);
           repaint();
         }
-
         protected static void start(GameField game_Field) throws IOException {
             backGround = ImageIO.read(GameWindow.class.getResourceAsStream("BackGround.png"));
             gameOver = ImageIO.read(GameWindow.class.getResourceAsStream("game_over.png"));
             drop = ImageIO.read(GameWindow.class.getResourceAsStream("drop.png"));
             game_window = new GameWindow();
-            game_window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            isActive = true;
+            game_window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            game_window.addWindowListener(new WindowListener() {
+                @Override
+                public void windowOpened(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    isActive = false;
+                    game_window.dispose();
+                    panel1.setVisible(true);
+                }
+
+                @Override
+                public void windowClosed(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowIconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeiconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+
+                }
+            });
             game_window.setLocation(500, 100);
             game_window.setSize(906, 478);
             game_window.setResizable(false);
+            isActive = true;
             last_frame_time = System.nanoTime();
             game_window.setTitle("Score = " + score + " live = " + live);
             game_window.add(game_Field);
             game_window.setVisible(true);
-            //game_window.setTitle("fail 10");
             game_Field.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     super.mousePressed(e);
                     int x = e.getX();
                     int y = e.getY();
-                    float smr = 300 + start_Menu.getWidth(null);
-                    float smb = 150 + start_Menu.getHeight(null);
-                    boolean is_menu = x >= 300 && x <= smr && y <= smb && y >= 150;
-                    if (is_menu) {
-                        i = false;
-                        //GameField game_Field = new GameField();
-                        // game_Field.start(game_Field);
-                        //game_window.add(game_Field);
-                        game_window.setTitle("fail 2 ");
-                    }
                     float drop_right = drop_left + drop.getWidth(null);
                     float drop_bottom = drop_top + drop.getHeight(null);
                     boolean is_drop = x >= drop_left && x <= drop_right && y <= drop_bottom && y >= drop_top;
@@ -271,7 +289,6 @@ public class GameWindow extends JFrame {
                 }
             });
         }
-
     }
     public static class Sound implements AutoCloseable {
         private boolean released = false;
