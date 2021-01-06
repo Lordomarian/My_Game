@@ -1,15 +1,11 @@
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
-import java.net.URL;
+import java.io.*;
 import java.util.Random;
 import java.util.Scanner;
 /* @author Mihail Kolzlov
@@ -33,8 +29,9 @@ public class GameWindow extends JFrame {
     private static int live = 3;
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SwingApp.switchMenu();
+        Sound.repeat("fon.wav",0.8f,6);
     }
 
     public static void change(){
@@ -89,7 +86,8 @@ public class GameWindow extends JFrame {
     public static void sort() throws FileNotFoundException {
         int a;
         int b;
-        File file = new File("src/main/resources/Score.txt");
+        ClassLoader classLoader = GameWindow.class.getClassLoader();
+        File file = new File(classLoader.getResource("Score.txt").getFile());
         Scanner scanner = new Scanner(file);
         int[] result = new int[10];
         for (int i = 0; i < result.length;i++){
@@ -112,7 +110,8 @@ public class GameWindow extends JFrame {
                 break;
             }
         }
-        PrintWriter pw = new PrintWriter(file);
+
+        PrintWriter pw = new PrintWriter(String.valueOf(file));
         for (int i = 0; i < result.length;i++){
             pw.println(result[i]);
         }
@@ -132,6 +131,7 @@ public class GameWindow extends JFrame {
             repaint();
         }
         protected static void start(GameField game_Field) throws IOException {
+//            Sound back = new Sound("",0.4f);
            JFrame panel1 = SwingApp.getPanel1();
             backGround = ImageIO.read(GameWindow.class.getResourceAsStream("BackGround.png"));
             gameOver = ImageIO.read(GameWindow.class.getResourceAsStream("game_over.png"));

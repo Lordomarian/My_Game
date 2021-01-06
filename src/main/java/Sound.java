@@ -5,9 +5,9 @@ import java.net.URL;
 public class Sound implements AutoCloseable {
     private boolean released ;
     private AudioInputStream stream = null;
-    private Clip clip = null;
+    private static Clip clip = null;
     private boolean playing = false;
-    private FloatControl volumeControl = null;
+    private static FloatControl volumeControl = null;
 
     public  Sound  (String name, float x) {
         try {
@@ -60,7 +60,17 @@ public class Sound implements AutoCloseable {
                 exc.printStackTrace();
             }
     }
-    public void setVolume(float x) {
+    public static void repeat (String name, float x, int count) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        URL defaultSound = Sound.class.getResource(name);
+        AudioInputStream ais = AudioSystem.getAudioInputStream(defaultSound);
+        Clip clip = AudioSystem.getClip();
+        clip.open(ais);
+        clip.setLoopPoints(0,-1);
+        clip.loop(count);
+        volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        setVolume(x);
+    }
+    public static void setVolume(float x) {
         if (x<0) x = 0;
         if (x>1) x = 1;
         float min = volumeControl.getMinimum();
