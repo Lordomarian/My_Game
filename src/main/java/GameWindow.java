@@ -8,7 +8,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.Random;
 import java.util.Scanner;
-/* @author Mihail Kolzlov
+/* @author Mihail Kozlov
        *create by Mihail Kozlov 30.12.2020
        * My game catch a drop 
        */
@@ -19,7 +19,8 @@ public class GameWindow extends JFrame {
     private static Image backGround;
     private static Image gameOver;
     private static Image drop;
-
+    private static int volume= 7;
+    private static int volumeBackground= 8;
     private static float drop_left = 400;
     private static float drop_top = -100;
     private static float drop_v = 200;
@@ -31,7 +32,23 @@ public class GameWindow extends JFrame {
 
     public static void main(String[] args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SwingApp.switchMenu();
-        Sound.repeat("fon.wav",0.8f,6);
+        Sound.repeat("fon.wav",0.1f*volumeBackground,6);
+    }
+
+    public static void setVolume(int volume) {
+        GameWindow.volume = volume;
+    }
+
+    public static int getVolume() {
+        return volume;
+    }
+
+    public static void setVolumeBackground(int volumeBackground) {
+        GameWindow.volumeBackground = volumeBackground;
+    }
+
+    public static int getVolumeBackground() {
+        return volumeBackground;
     }
 
     public static void change(){
@@ -64,7 +81,7 @@ public class GameWindow extends JFrame {
         }
         if (drop_top > game_window.getHeight()) {
             live = live - 1;
-            Sound s = new Sound("fail.wav",0.55f);
+            new Sound("fail.wav",0.1f*volume);
             Random rand = new Random();
             int r = rand.nextInt(20) - 10;
             drop_top = -100;
@@ -73,7 +90,7 @@ public class GameWindow extends JFrame {
             drop_vy = 20 * r;
             game_window.setTitle("Score = " + score + " live = " + live);
             if (live == 0) {
-                Sound t = new Sound("death.wav",0.65f);
+                new Sound("death.wav",0.1f*volume);
             }
         }
         game_window.setTitle("Score = " + score + " live = " + live);
@@ -131,7 +148,6 @@ public class GameWindow extends JFrame {
             repaint();
         }
         protected static void start(GameField game_Field) throws IOException {
-//            Sound back = new Sound("",0.4f);
            JFrame panel1 = SwingApp.getPanel1();
             backGround = ImageIO.read(GameWindow.class.getResourceAsStream("BackGround.png"));
             gameOver = ImageIO.read(GameWindow.class.getResourceAsStream("game_over.png"));
@@ -218,7 +234,7 @@ public class GameWindow extends JFrame {
                     if (is_drop) {
                         Random rand = new Random();
                         int r = rand.nextInt(20) - 10;
-                        Sound s = new Sound("zvuk-kapli.wav", 0.4f);
+                        new Sound("zvuk-kapli.wav", 0.1f*volume);
                         drop_top = -100;
                         drop_left = (int) (Math.random() * ((game_Field.getWidth()) - drop.getWidth(null)));
                         drop_v = drop_v + 20;

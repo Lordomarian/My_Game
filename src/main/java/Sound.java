@@ -6,6 +6,7 @@ public class Sound implements AutoCloseable {
     private boolean released ;
     private AudioInputStream stream = null;
     private static Clip clip = null;
+    private static Clip clip1 = null;
     private boolean playing = false;
     private static FloatControl volumeControl = null;
 
@@ -13,7 +14,7 @@ public class Sound implements AutoCloseable {
         try {
             URL defaultSound = this.getClass().getResource(name);
             AudioInputStream ais = AudioSystem.getAudioInputStream(defaultSound);
-            Clip clip = AudioSystem.getClip();
+            clip = AudioSystem.getClip();
             clip.open(ais);
             clip.start();
             volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -63,14 +64,19 @@ public class Sound implements AutoCloseable {
     public static void repeat (String name, float x, int count) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         URL defaultSound = Sound.class.getResource(name);
         AudioInputStream ais = AudioSystem.getAudioInputStream(defaultSound);
-        Clip clip = AudioSystem.getClip();
-        clip.open(ais);
-        clip.setLoopPoints(0,-1);
-        clip.loop(count);
-        volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        clip1 = AudioSystem.getClip();
+        clip1.open(ais);
+        clip1.setLoopPoints(0,-1);
+        clip1.loop(count);
+        volumeControl = (FloatControl) clip1.getControl(FloatControl.Type.MASTER_GAIN);
+        setVolume(x);
+    }
+    public static void setVolume1(float x){
+        volumeControl = (FloatControl) clip1.getControl(FloatControl.Type.MASTER_GAIN);
         setVolume(x);
     }
     public static void setVolume(float x) {
+
         if (x<0) x = 0;
         if (x>1) x = 1;
         float min = volumeControl.getMinimum();
