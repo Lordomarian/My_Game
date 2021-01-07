@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -6,19 +7,23 @@ import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.awt.Color;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class SwingApp extends JFrame {
     private static String menuType = "A1";
     private static JFrame  panel1 = new JFrame();
-
+    private static JCheckBox jCheckBox = new JCheckBox();
+    private static JCheckBox arcadeCheckBox = new JCheckBox();
     public static JFrame getPanel1() {
         return panel1;
     }
+    private static String difficulty = "easy";
 
     protected static void addComponentsToPanel(Container panel) {
         panel.setLayout(null);
@@ -33,11 +38,25 @@ public class SwingApp extends JFrame {
             GameWindow.GameField gameField = new GameWindow.GameField();
             boolean isActive = GameWindow.getActive();
             try {
-                if (isActive) {
-                    return;
-                } else {
-                    panel1.setVisible(false);
-                    GameWindow.GameField.start(gameField);
+                if (!isActive) {
+                    switch (difficulty) {
+                        case "easy":
+                            GameWindow.drop_vy = 0;
+                            GameWindow.multiple = 0;
+                            break;
+                        case "norm":
+                            break;
+                        case "hard":
+                            GameWindow.drop_v = 500;
+                            GameWindow.drop_vy = 50;
+                            break;
+                    }
+                    if (arcadeCheckBox.isSelected()) {
+                        panel1.setVisible(jCheckBox.isSelected());
+                        GameWindow.GameField.start(gameField);
+                    } else {
+
+                    }
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -86,14 +105,19 @@ public class SwingApp extends JFrame {
         panel.add(creditButton);
         panel.setBackground(new Color(53, 53, 73));
     }
-    protected static void createAndShowGUI() {
+
+    protected static void createAndShowGUI() throws IOException {
         panel1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel1.setResizable(false);
+        BufferedImage drop;
+        drop = ImageIO.read(GameWindow.class.getResourceAsStream("drop.png"));
+        panel1.setIconImage(drop);
         panel1.setVisible(true);
         panel1.setLocation(800, 300);
         addComponentsToPanel(panel1.getContentPane());
         panel1.setSize(305, 340);
     }
+
     protected static void switchMenu() throws IOException {
         switch (menuType) {
             case "A1"://menu
@@ -130,16 +154,15 @@ public class SwingApp extends JFrame {
                 break;
         }
     }
-    private static void appendToPane(JTextPane tp, String msg, Color c)
-    {
+
+    private static void appendToPane(JTextPane tp, String msg, Color c) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
 
-       // int len = tp.getDocument().getLength();
-        //tp.setCaretPosition(len);
         tp.setCharacterAttributes(aset, false);
         tp.replaceSelection(msg);
     }
+
     private static void showMenuB(Container panel) throws FileNotFoundException {
         panel.setLayout(null);
 
@@ -147,9 +170,9 @@ public class SwingApp extends JFrame {
         textArea.setBounds(50 ,0,200,250);
 
         String sb = ("             Best Results \n");
-        
+
         ClassLoader classLoader = SwingApp.class.getClassLoader();
-        File file = new File(classLoader.getResource("Score.txt").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("Score.txt")).getFile());
         Scanner scanner = new Scanner(file);
         int[] mass = new  int[10];
         for (int i = 0; i < mass.length;i++){
@@ -183,7 +206,6 @@ public class SwingApp extends JFrame {
 
     }
 
-
     private static void showMenuC(Container panel) {
         panel.setLayout(null);
 
@@ -193,46 +215,82 @@ public class SwingApp extends JFrame {
         JButton minesButton = new JButton("-");
         JButton plusButton1 = new JButton("+");
         JButton minesButton1 = new JButton("-");
-
+        JButton plusButton2 = new JButton("+");
+        JButton minesButton2 = new JButton("-");
+        jCheckBox.setBounds(41 , 125 ,21 ,20 );
+        arcadeCheckBox.setBounds(41 , 215 ,21 ,20 );
         JTextPane textArea = new JTextPane();
         JTextPane textArea1 = new JTextPane();
-        String volume =  "      Effect volume \n               " + String.valueOf(10*GameWindow.getVolume())+ " %";
-        String volumeBackground = " Background volume\n               " + String.valueOf(10*GameWindow.getVolumeBackground())+ " %";
+        JTextPane textArea2 = new JTextPane();
+        JTextPane textCheckBox = new JTextPane();
+        JTextPane textArcadeCheckBox = new JTextPane();
+        String gameLvl = "            Difficulty \n               " + difficulty;
+        String arcade = "        Play arcade?";
+        String checkBox = "Show menu while playing";
+        String volume =  "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
+        String volumeBackground = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
         appendToPane(textArea,volume,Color.yellow);
+        appendToPane(textArea2,gameLvl,Color.yellow);
         appendToPane(textArea1,volumeBackground,Color.YELLOW);
+        appendToPane(textCheckBox,checkBox,Color.YELLOW);
+        appendToPane(textArcadeCheckBox,arcade,Color.YELLOW);
+        textCheckBox.setBounds(80 ,123,170,30);
         textArea.setBounds(90 ,10,120,45);
         textArea1.setBounds(90 ,60,120,45);
+        textArea2.setBounds(90,155,120,45);
+        textArcadeCheckBox.setBounds(90, 213,120,30);
+
         textArea.setEditable(false);
         textArea1.setEditable(false);
-        textArea.setText(volume);
-        textArea1.setText(volumeBackground);
+        textArea2.setEditable(false);
+        textArcadeCheckBox.setEditable(false);
+        textCheckBox.setEditable(false);
+
+
         panel.add(textArea);
         panel.add(textArea1);
+        panel.add(textArea2);
+        panel.add(textCheckBox);
+        panel.add(textArcadeCheckBox);
 
         textArea.setSelectionColor(new Color(53, 53, 73));
         textArea1.setSelectionColor(new Color(53, 53, 73));
+        textArea2.setSelectionColor(new Color(53, 53, 73));
+        textCheckBox.setSelectionColor(new Color(53, 53, 73));
+        textArcadeCheckBox.setSelectionColor(new Color(53, 53, 73));
+
         textArea.setBackground(new Color(53, 53, 73));
         textArea1.setBackground(new Color(53, 53, 73));
+        textArea2.setBackground(new Color(53, 53, 73));
+        textCheckBox.setBackground(new Color(53, 53, 73));
+        textArcadeCheckBox.setBackground(new Color(53, 53, 73));
+
         quitButton.setPreferredSize(new Dimension(100, 90));
         Insets insets = panel.getInsets();
         Dimension size = quitButton.getPreferredSize();
 
-        minesButton1.setBounds(25 + insets.left, 70 + insets.top, size.width -50, size.height - 50);
-        plusButton1.setBounds(225 + insets.left, 70 + insets.top, size.width -50, size.height - 50);
         minesButton.setBounds(25 + insets.left, 20 + insets.top, size.width -50, size.height - 50);
         plusButton.setBounds(225 + insets.left, 20 + insets.top, size.width -50, size.height - 50);
+        minesButton1.setBounds(25 + insets.left, 70 + insets.top, size.width -50, size.height - 50);
+        plusButton1.setBounds(225 + insets.left, 70 + insets.top, size.width -50, size.height - 50);
+        minesButton2.setBounds(25 + insets.left, 160 + insets.top, size.width -50, size.height - 50);
+        plusButton2.setBounds(225 + insets.left, 160 + insets.top, size.width -50, size.height - 50);
         quitButton.setBounds(25 + insets.left, 250 + insets.top, size.width + 150, size.height - 50);
 
         panel.add(plusButton);
-        panel.add(quitButton);
         panel.add(minesButton);
         panel.add(plusButton1);
         panel.add(minesButton1);
+        panel.add(plusButton2);
+        panel.add(minesButton2);
+        panel.add(jCheckBox);
+        panel.add(arcadeCheckBox);
+        panel.add(quitButton);
 
         plusButton.addActionListener(e -> {
             if (GameWindow.getVolume() < 10 ){
                 GameWindow.setVolume(GameWindow.getVolume()+1);
-                String volume1 = "      Effect volume \n               " + String.valueOf(10*GameWindow.getVolume())+ " %";
+                String volume1 = "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
                 new Sound("zvuk-kapli.wav", 0.1f*GameWindow.getVolume());
                 textArea.setText(volume1);
             }
@@ -240,7 +298,7 @@ public class SwingApp extends JFrame {
         minesButton.addActionListener(e -> {
             if (GameWindow.getVolume() >0 ){
                 GameWindow.setVolume(GameWindow.getVolume()-1);
-                String volume1 = "      Effect volume \n               " + String.valueOf(10*GameWindow.getVolume())+ " %";
+                String volume1 = "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
                 new Sound("zvuk-kapli.wav", 0.1f*GameWindow.getVolume());
                 textArea.setText(volume1);
             }
@@ -249,7 +307,7 @@ public class SwingApp extends JFrame {
             if (GameWindow.getVolumeBackground() < 10 ){
                 GameWindow.setVolumeBackground(GameWindow.getVolumeBackground()+1);
                 Sound.setVolume1(0.1f*GameWindow.getVolumeBackground());
-                String volumeBackground1 = " Background volume\n               " + String.valueOf(10*GameWindow.getVolumeBackground())+ " %";
+                String volumeBackground1 = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
                 textArea1.setText(volumeBackground1);
             }
         });
@@ -257,19 +315,47 @@ public class SwingApp extends JFrame {
             if (GameWindow.getVolumeBackground() >0 ){
                 GameWindow.setVolumeBackground(GameWindow.getVolumeBackground()-1);
                 Sound.setVolume1(0.1f*GameWindow.getVolumeBackground());
-                String volumeBackground1 = " Background volume\n               " + String.valueOf(10*GameWindow.getVolumeBackground())+ " %";
+                String volumeBackground1 = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
                 textArea1.setText(volumeBackground1);
             }
         });
+        plusButton2.addActionListener(e -> {
+            if (difficulty.equals("easy")){
+                difficulty = "norm";
+                String gameLvl1 = "            Difficulty \n               " + difficulty;
+                textArea2.setText(gameLvl1);
+                System.out.println(difficulty);
+            }else if(difficulty.equals("norm")){
+                difficulty ="hard";
+                String gameLvl1 = "            Difficulty \n               " + difficulty;
+                textArea2.setText(gameLvl1);
+                System.out.println(difficulty);
+            }
+        });
+        minesButton2.addActionListener(e -> {
+            if (difficulty.equals("hard") ){
+                difficulty = "norm";
+                String gameLvl1 = "            Difficulty \n               " + difficulty;
+                textArea2.setText(gameLvl1);
+                System.out.println(difficulty);
+            }else if( difficulty.equals("norm")){
+                difficulty = "easy";
+                String gameLvl1 = "            Difficulty \n               " + difficulty;
+                textArea2.setText(gameLvl1);
+                System.out.println(difficulty);
+            }
+        });
+
         ActionListener quit = new QuitActionListener();
         quitButton.addActionListener(quit);
     }
+
     private static void showMenuD(Container panel) {
         panel.setLayout(null);
 
         JTextPane textPane = new JTextPane();
         textPane.setBounds(50 ,0,200,250);
-        String s = new String("\n\n              Created by: \n \n             Lordomarian \n\n \n\n \n\n\n                (с) 2020");
+        String s = ("\n\n              Created by: \n \n             Lordomarian \n\n \n\n \n\n\n                (с) 2020");
 
         panel.add(textPane);
         Font font = new Font("Vardana",Font.BOLD,15);
@@ -292,6 +378,7 @@ public class SwingApp extends JFrame {
         quitButton.addActionListener(quit);
 
     }
+
     public static class QuitActionListener implements ActionListener{
 
         @Override
