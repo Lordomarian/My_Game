@@ -17,6 +17,8 @@ import java.util.Scanner;
 public class GameWindow extends JFrame {
     private static long last_frame_time;
     private static GameWindow game_window;
+    private static Image nextLvl;
+    private static Image win;
     private static Image backGround;
     private static Image gameOver;
     private static Image drop;
@@ -29,8 +31,13 @@ public class GameWindow extends JFrame {
     protected static int multiple = 2;
     private static float drop_vy1 ;
     private static int score = 0;
+    private static int lvl = 1 ;
+    private static boolean isWin= false;
     private static boolean isActive = false;
+    private static boolean isLvl= true;
+    private static boolean isLvl1= false;
     protected static int live = 3;
+    private static boolean s = true;
 
 
     public static void main(String[] args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
@@ -60,32 +67,61 @@ public class GameWindow extends JFrame {
         drop_v = 200;
         drop_vy = 20 ;
         score = 0;
+        isLvl= true;
+        isLvl1= false;
         live = 3;
+        s = true;
     }
-
     private static void onRepaint(Graphics g) throws FileNotFoundException {
         long current_time = System.nanoTime();
+        Font font = new Font("Jane",Font.BOLD,15);
+        g.setFont(font);
+        g.setColor(Color.RED);
         float drop_right = drop_left + drop.getWidth(null);
         float delta_time = (current_time - last_frame_time) * 0.000000001f;
         last_frame_time = current_time;
+        g.drawImage(backGround, -253, 0, null);
         boolean is_drop1 = 0 > drop_left || drop_right > 906;
         if (is_drop1) {
             drop_vy1 = drop_vy1 * -1;
         }
+        if (!SwingApp.isArcade){
+                    if (score == 10 && isLvl ){
+                        g.drawString("You win lvl 1  click on for play lvl 2  ",340,90);
+                        drop_left = 400;
+                        drop_top = -200;
+                        lvl = 2 ;
+                        isLvl1 = true;
+                        g.drawImage(nextLvl,430,140,null);
+                    }else if (score == 25 && isLvl1 ){
+                        g.drawString("You win lvl 2  click on for play lvl 3  ",340,70);
+                        drop_left = 400;
+                        drop_top = -200;
+                        lvl = 3 ;
+                        g.drawImage(nextLvl,430,140,null);
+                    }else if (score == 40){
+
+                        g.drawString("Congratulation! YOU WIN the game ",320,70);
+                        g.drawString("if u want play arcade press checkbox in settings", 280 ,95);
+                        drop_left = 400;
+                        drop_top = -200;
+                        g.drawImage(win, 345, 120, null);
+                        isWin = true;
+                        if (s) {
+                            new Sound("win.wav", 0.1f * volume);
+                            s = false;
+                        }
+                    }
+        }
         drop_top = drop_top + drop_v * delta_time;
         drop_left = drop_left + drop_vy1 * delta_time;
-        g.drawImage(backGround, -253, 0, null);
         g.drawImage(drop, (int) drop_left, (int) drop_top, null);
         if (live <= 0) {
             g.drawImage(gameOver, 280, 120, null);
-            JTextPane textPane = new JTextPane();
-            textPane.setBounds(50 ,0,200,250);
-            Font font = new Font("Jane",Font.BOLD,15);
-            g.setFont(font);
-            g.setColor(Color.RED);
-            g.drawString("Game Over! Your score is " + score ,340 ,70);
-
+            g.drawString("Game Over! Your score is " + score * SwingApp.i ,340 ,70);
+            g.drawString("    Difficulty is " + SwingApp.difficulty, 370,90);
             g.drawString("Click on the 'Game Over' to go to the menu ", 290,110);
+            g.drawString("if u want play arcade press checkbox in settings", 275 ,370);
             drop_v = 0;
             drop_vy1 = 0;
             drop_top = -100;
@@ -152,38 +188,24 @@ public class GameWindow extends JFrame {
 
 
     protected static class GameField extends JPanel{
-        private static boolean lvlUp=false;
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-//            if (score < 10) {
                 try {
                     onRepaint(g);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-//
-//            }else if(score == 10){
-//                g.drawImage(backGround, -253, 0, null);
-//                g.drawString("Hello",100,100);
-//                drop_left = 100;
-//                drop_top = 200;
-//                g.drawImage(drop, (int) drop_left, (int) drop_top, null);
-//
-//            }else if (score > 10){
-//                change();
-//                try {
-//                    onRepaint(g);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
                 repaint();
-//            }
         }
         protected static void start(GameField game_Field) throws IOException {
             JFrame panel1 = SwingApp.getPanel1();
+            if (SwingApp.difficulty.equals("hard")&&!SwingApp.isArcade){
+                live =2;
+            }
+            nextLvl =ImageIO.read((GameWindow.class.getResourceAsStream("nextlvl (1).png")));
+            win = ImageIO.read((GameWindow.class.getResourceAsStream("crown.png")));
             backGround = ImageIO.read(GameWindow.class.getResourceAsStream("BackGround.png"));
             gameOver = ImageIO.read(GameWindow.class.getResourceAsStream("game_over.png"));
             drop = ImageIO.read(GameWindow.class.getResourceAsStream("drop.png"));
@@ -200,6 +222,11 @@ public class GameWindow extends JFrame {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     isActive = false;
+                    isWin = false;
+                    isLvl= true;
+                    isLvl1= false;
+                    score= score*SwingApp.i;
+
                     game_window.dispose();
                     panel1.setVisible(true);
                     try {
@@ -244,6 +271,59 @@ public class GameWindow extends JFrame {
             game_window.setTitle("Score = " + score + " live = " + live);
             game_window.add(game_Field);
             game_window.setVisible(true);
+
+            game_Field.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+
+                    super.mousePressed(e);
+                    int x = e.getX();
+                    int y = e.getY();
+                    boolean lvlUp1 = x >= 345 && x<= 345+win.getWidth(null) && y <=120+win.getHeight(null) && y >=120;
+
+                    if (isWin&&lvlUp1){
+                        isWin = false;
+                        isActive = false;
+                        isLvl= true;
+                        isLvl1= false;
+                        game_window.dispose();
+                        panel1.setVisible(true);
+                        score = score * SwingApp.i;
+                        try {
+                            sort();
+                        } catch (FileNotFoundException fileNotFoundException) {
+                            fileNotFoundException.printStackTrace();
+                        }
+                        change();
+                    }
+                    boolean lvlUp = x >= 430 && x<= 430+nextLvl.getWidth(null) && y <=140+nextLvl.getHeight(null) && y >=140;
+                    if ((lvl == 2 ) && lvlUp){
+                        lvl = 0 ;
+                        Random rand = new Random();
+                        int r = rand.nextInt(20) - 10;
+                        isLvl = false;
+                        live+=1;
+                        drop_top = -150;
+                        drop_left = (int) (Math.random() * ((game_Field.getWidth()) - drop.getWidth(null)));
+                        drop_v = drop_v + 100;
+                        drop_vy = drop_vy + 2*multiple;
+                        drop_vy1 = drop_vy * r;
+                    }
+                    if ((lvl == 3 ) && lvlUp){
+                        Random rand = new Random();
+                        lvl = 0;
+                        int r = rand.nextInt(20) - 10;
+                        isLvl1 = false;
+                        live+=1;
+                        drop_top = -150;
+                        drop_left = (int) (Math.random() * ((game_Field.getWidth()) - drop.getWidth(null)));
+                        drop_v = drop_v + 100;
+                        drop_vy = drop_vy + 3*multiple;
+                        drop_vy1 = drop_vy * r;
+                    }
+                }
+            });
             game_Field.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -252,14 +332,13 @@ public class GameWindow extends JFrame {
                     int y = e.getY();
                     float gameOver_right = 280 + gameOver.getWidth(null);
                     float gameOver_bottom = 120 + gameOver.getHeight(null);
-                    boolean lvlUp1 = x >= 279 && x<= gameOver_right && y <=gameOver_bottom && y >=120;
-                    if (lvlUp1 &&score == 10){
-                        lvlUp = true;
-                    }
-                    boolean is_Game_Over = x >= 280 && x<= gameOver_right && y <=gameOver_bottom && y >=120;
-                    if (is_Game_Over && live <= 0){
+
+
+                    boolean is_Game_Over = x >= 280 && x <= gameOver_right && y <= gameOver_bottom && y >= 120;
+                    if (is_Game_Over && live <= 0) {
                         isActive = false;
                         game_window.dispose();
+                        score = score*SwingApp.i;
                         panel1.setVisible(true);
                         try {
                             sort();
@@ -274,15 +353,17 @@ public class GameWindow extends JFrame {
                     if (is_drop) {
                         Random rand = new Random();
                         int r = rand.nextInt(20) - 10;
-                        new Sound("zvuk-kapli.wav", 0.1f*volume);
-                        drop_top = -100;
+                        new Sound("zvuk-kapli.wav", 0.1f * volume);
+                        drop_top = -150;
                         drop_left = (int) (Math.random() * ((game_Field.getWidth()) - drop.getWidth(null)));
                         drop_v = drop_v + 20;
                         drop_vy = drop_vy + multiple;
-                        drop_vy1 =drop_vy* r;
+                        drop_vy1 = drop_vy * r;
                         score += 1;
                         game_window.setTitle("Score = " + score + " live = " + live);
+
                     }
+
                 }
             });
         }

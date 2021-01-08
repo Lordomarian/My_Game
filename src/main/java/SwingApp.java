@@ -17,13 +17,15 @@ import java.util.Scanner;
 
 public class SwingApp extends JFrame {
     private static String menuType = "A1";
-    private static JFrame  panel1 = new JFrame();
-    private static JCheckBox jCheckBox = new JCheckBox();
-    private static JCheckBox arcadeCheckBox = new JCheckBox();
+    private static final JFrame  panel1 = new JFrame();
+    private static final JCheckBox jCheckBox = new JCheckBox();
+    private static final JCheckBox arcadeCheckBox = new JCheckBox();
     public static JFrame getPanel1() {
         return panel1;
     }
-    private static String difficulty = "easy";
+    protected static String difficulty = "easy";
+    protected static boolean isArcade = false;
+    protected static int i = 1;
 
     protected static void addComponentsToPanel(Container panel) {
         panel.setLayout(null);
@@ -45,18 +47,17 @@ public class SwingApp extends JFrame {
                             GameWindow.multiple = 0;
                             break;
                         case "norm":
+                            i=2;
                             break;
                         case "hard":
+                            i=3;
                             GameWindow.drop_v = 500;
                             GameWindow.drop_vy = 50;
                             break;
                     }
-                    if (arcadeCheckBox.isSelected()) {
-                        panel1.setVisible(jCheckBox.isSelected());
-                        GameWindow.GameField.start(gameField);
-                    } else {
-
-                    }
+                    isArcade = arcadeCheckBox.isSelected();
+                    panel1.setVisible(jCheckBox.isSelected());
+                    GameWindow.GameField.start(gameField);
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -324,12 +325,10 @@ public class SwingApp extends JFrame {
                 difficulty = "norm";
                 String gameLvl1 = "            Difficulty \n               " + difficulty;
                 textArea2.setText(gameLvl1);
-                System.out.println(difficulty);
             }else if(difficulty.equals("norm")){
                 difficulty ="hard";
                 String gameLvl1 = "            Difficulty \n               " + difficulty;
                 textArea2.setText(gameLvl1);
-                System.out.println(difficulty);
             }
         });
         minesButton2.addActionListener(e -> {
@@ -337,12 +336,11 @@ public class SwingApp extends JFrame {
                 difficulty = "norm";
                 String gameLvl1 = "            Difficulty \n               " + difficulty;
                 textArea2.setText(gameLvl1);
-                System.out.println(difficulty);
+
             }else if( difficulty.equals("norm")){
                 difficulty = "easy";
                 String gameLvl1 = "            Difficulty \n               " + difficulty;
                 textArea2.setText(gameLvl1);
-                System.out.println(difficulty);
             }
         });
 
