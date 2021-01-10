@@ -6,9 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
+import java.util.List;
 /* @author Mihail Kozlov
        *create by Mihail Kozlov 30.12.2020
        * My game catch a drop 
@@ -39,6 +38,9 @@ public class GameWindow extends JFrame {
     protected static int live = 3;
     private static boolean s = true;
 
+    protected static List<Integer> scoreList = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+    private static final String scoreListName = "ScoreList.bin";
 
     public static void main(String[] args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SwingApp.switchMenu();
@@ -151,45 +153,44 @@ public class GameWindow extends JFrame {
         return isActive;
     }
 
+    public static void saveScore(List<Integer> scoreList) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(scoreListName))) {
+            oos.writeObject(scoreList);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    public static void readScore() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(scoreListName))) {
+            scoreList = (ArrayList<Integer>) ois.readObject();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("Class not found");
+            c.printStackTrace();
+        }
+    }
+
     public static void sort() throws IOException {
-        int a;
-        int b;
-        InputStream in = GameWindow.class.getResourceAsStream("/Score.txt");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        ClassLoader classLoader = GameWindow.class.getClassLoader();
-        //File file = new File(Objects.requireNonNull(classLoader.getResource("Score.txt")).getFile());
-       // Scanner scanner = new Scanner(file);
-        int[] result = new int[10];
-        for (int i = 0; i < result.length;i++){
-            result[i] = Integer.parseInt(reader.readLine());
-            System.out.println(result[i]);
-        }
-        //scanner.close();
-        for (int i = 0;i <result.length; i++){
-            if (result[i] > score ){
-                continue;
-            }else if(result[result.length-1] > score) {
-                break;
-            }else{
-                a = result[i];
-                result[i]=score;
-                for (int j = i+1; j < result.length ; j++){
-                    b = result[j];
-                    result[j] = a;
-                    a = b;
-                }
-                break;
-            }
+
+        File scoreFile = new File(scoreListName);
+        if (scoreFile.exists()) {
+            readScore();
+        } else {
+            saveScore(scoreList);
         }
 
-        PrintWriter pw = new PrintWriter(String.valueOf(in));
-        //OutputStream os = GameWindow.class.getResourceAsStream("/Score.txt");
-        //try (BufferedWriter bw = new BufferedWriter()) {
-        //}
-        for (int i = 0; i < result.length;i++){
+        scoreList.add(score);
 
-        pw.close();
-            }
+        scoreList.sort(Collections.reverseOrder());
+
+        List<Integer> tmpSortList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tmpSortList.add(scoreList.get(i));
+        }
+
+        saveScore(tmpSortList);
     }
 
 

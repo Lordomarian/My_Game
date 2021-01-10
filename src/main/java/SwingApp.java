@@ -170,26 +170,19 @@ public class SwingApp extends JFrame {
         JTextPane textArea = new JTextPane();
         textArea.setBounds(50 ,0,200,250);
 
-        String sb = "             Best Results \n";
-
-        ClassLoader classLoader = SwingApp.class.getClassLoader();
-        File file = new File(classLoader.getResource("Score.txt").getFile());
-        Scanner scanner = new Scanner(file);
-        int[] mass = new  int[10];
-        for (int i = 0; i < mass.length;i++){
-            mass[i] =scanner.nextInt();
-            String str = Integer.toString(mass[i]);
-
-            sb = sb + "                 "+ +  (1 + i)  + "   -   " + str + "\n";
+        StringBuilder sb = new StringBuilder("             Best Results \n");
+        GameWindow.readScore();
+        int k = 1;
+        for (Integer score : GameWindow.scoreList) {
+            sb.append("                 ").append(k++).append("   -   ").append(score).append("\n");
         }
-        scanner.close();
 
         Font font = new Font("Vardana",Font.BOLD,16);
         textArea.setFont(font);
-        appendToPane(textArea,sb,Color.green);
+        appendToPane(textArea,sb.toString(),Color.green);
         textArea.setSelectionColor(new Color(53, 53, 73));
         textArea.setBackground(new Color(53, 53, 73));
-        textArea.setText(sb);
+        textArea.setText(sb.toString());
 
         textArea.setEditable(false);
         panel.add(textArea);
