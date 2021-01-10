@@ -3,8 +3,8 @@ import java.io.IOException;
 import java.net.URL;
 
 public class Sound implements AutoCloseable {
-    private boolean released ;
-    private AudioInputStream stream = null;
+    private boolean released;
+    private  AudioInputStream stream = null;
     private static Clip clip = null;
     private static Clip clip1 = null;
     private boolean playing = false;
@@ -29,12 +29,10 @@ public class Sound implements AutoCloseable {
         }
 
     }
-    public boolean isPlaying() {
-        return playing;
-    }
-    public boolean isReleased() {
-        return released;
-    }
+
+    public boolean isPlaying() { return playing; }
+
+    public boolean isReleased() { return released; }
 
     public void play ( boolean breakOld){
         if (released) {
@@ -50,6 +48,7 @@ public class Sound implements AutoCloseable {
             }
         }
     }
+
     public void close() {
         if (clip != null)
             clip.close();
@@ -61,6 +60,7 @@ public class Sound implements AutoCloseable {
                 exc.printStackTrace();
             }
     }
+
     public static void repeat (String name, float x, int count) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         URL defaultSound = Sound.class.getResource(name);
         AudioInputStream ais = AudioSystem.getAudioInputStream(defaultSound);
@@ -71,10 +71,12 @@ public class Sound implements AutoCloseable {
         volumeControl = (FloatControl) clip1.getControl(FloatControl.Type.MASTER_GAIN);
         setVolume(x);
     }
+
     public static void setVolume1(float x){
         volumeControl = (FloatControl) clip1.getControl(FloatControl.Type.MASTER_GAIN);
         setVolume(x);
     }
+
     public static void setVolume(float x) {
 
         if (x<0) x = 0;

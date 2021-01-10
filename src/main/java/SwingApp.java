@@ -1,4 +1,4 @@
-import javax.annotation.Resource;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -11,21 +11,23 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.awt.Color;
-import java.net.URL;
-import java.util.Objects;
-import java.util.Scanner;
+
 
 public class SwingApp extends JFrame {
+
+    public static JFrame getPanel1() {
+        return panel1;
+    }
+
+    protected static String difficulty = "easy";
+    protected static boolean isArcade = false;
+    protected static int i = 1;
+
     private static String menuType = "A1";
     private static final JFrame  panel1 = new JFrame();
     private static final JCheckBox jCheckBox = new JCheckBox();
     private static final JCheckBox arcadeCheckBox = new JCheckBox();
-    public static JFrame getPanel1() {
-        return panel1;
-    }
-    protected static String difficulty = "easy";
-    protected static boolean isArcade = false;
-    protected static int i = 1;
+
 
     protected static void addComponentsToPanel(Container panel) {
         panel.setLayout(null);
@@ -164,7 +166,7 @@ public class SwingApp extends JFrame {
         tp.replaceSelection(msg);
     }
 
-    private static void showMenuB(Container panel) throws IOException {
+    private static void showMenuB(Container panel) {
         panel.setLayout(null);
 
         JTextPane textArea = new JTextPane();
@@ -346,7 +348,7 @@ public class SwingApp extends JFrame {
 
         JTextPane textPane = new JTextPane();
         textPane.setBounds(50 ,0,200,250);
-        String s = "\n\n              Created by: \n \n             Lordomarian \n\n \n\n \n\n\n                (с) 2020";
+        String s = "\n\n              Created by: \n \n             Lordomarian \n\n               Bouncer77 \n\n \n\n\n                (с) 2020";
 
         panel.add(textPane);
         Font font = new Font("Vardana",Font.BOLD,15);

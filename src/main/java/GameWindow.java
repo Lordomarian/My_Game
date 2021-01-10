@@ -8,12 +8,22 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-/* @author Mihail Kozlov
+
+/** @author Mihail Kozlov , Kosenkov Ivan
        *create by Mihail Kozlov 30.12.2020
        * My game catch a drop 
        */
 
 public class GameWindow extends JFrame {
+
+    private static final String scoreListName = "ScoreList.bin";
+
+    protected static int live = 3;
+    protected static float drop_v = 200;
+    protected static float drop_vy = 20;
+    protected static int multiple = 2;
+    protected static List<Integer> scoreList = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
     private static long last_frame_time;
     private static GameWindow game_window;
     private static Image nextLvl;
@@ -25,22 +35,20 @@ public class GameWindow extends JFrame {
     private static int volumeBackground= 8;
     private static float drop_left = 400;
     private static float drop_top = -100;
-    protected static float drop_v = 200;
-    protected static float drop_vy = 20;
-    protected static int multiple = 2;
-    private static float drop_vy1 ;
+
+    private static float drop_vy1;
     private static int score = 0;
     private static int lvl = 1 ;
     private static boolean isWin= false;
     private static boolean isActive = false;
     private static boolean isLvl= true;
     private static boolean isLvl1= false;
-    protected static int live = 3;
+
     private static boolean s = true;
 
-    protected static List<Integer> scoreList = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
-    private static final String scoreListName = "ScoreList.bin";
+
+
 
     public static void main(String[] args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SwingApp.switchMenu();
@@ -74,50 +82,57 @@ public class GameWindow extends JFrame {
         live = 3;
         s = true;
     }
+
     private static void onRepaint(Graphics g) throws FileNotFoundException {
         long current_time = System.nanoTime();
         Font font = new Font("Jane",Font.BOLD,15);
         g.setFont(font);
         g.setColor(Color.RED);
+
         float drop_right = drop_left + drop.getWidth(null);
         float delta_time = (current_time - last_frame_time) * 0.000000001f;
         last_frame_time = current_time;
         g.drawImage(backGround, -253, 0, null);
+
         boolean is_drop1 = 0 > drop_left || drop_right > 906;
+
         if (is_drop1) {
             drop_vy1 = drop_vy1 * -1;
         }
-        if (!SwingApp.isArcade){
-                    if (score == 10 && isLvl ){
-                        g.drawString("You win lvl 1  click on for play lvl 2  ",340,90);
-                        drop_left = 400;
-                        drop_top = -200;
-                        lvl = 2 ;
-                        isLvl1 = true;
-                        g.drawImage(nextLvl,430,140,null);
-                    }else if (score == 25 && isLvl1 ){
-                        g.drawString("You win lvl 2  click on for play lvl 3  ",340,70);
-                        drop_left = 400;
-                        drop_top = -200;
-                        lvl = 3 ;
-                        g.drawImage(nextLvl,430,140,null);
-                    }else if (score == 40){
 
-                        g.drawString("Congratulation! YOU WIN the game ",320,70);
-                        g.drawString("if u want play arcade press checkbox in settings", 280 ,95);
-                        drop_left = 400;
-                        drop_top = -200;
-                        g.drawImage(win, 345, 120, null);
-                        isWin = true;
-                        if (s) {
-                            new Sound("win.wav", 0.1f * volume);
-                            s = false;
-                        }
-                    }
+        if (!SwingApp.isArcade){
+            if (score == 10 && isLvl ){
+                g.drawString("You win lvl 1  click on for play lvl 2  ",340,90);
+                drop_left = 400;
+                drop_top = -200;
+                lvl = 2 ;
+                isLvl1 = true;
+                g.drawImage(nextLvl,430,140,null);
+            }else if (score == 25 && isLvl1 ){
+                g.drawString("You win lvl 2  click on for play lvl 3  ",340,70);
+                drop_left = 400;
+                drop_top = -200;
+                lvl = 3 ;
+                g.drawImage(nextLvl,430,140,null);
+            }else if (score == 40){
+
+                g.drawString("Congratulation! YOU WIN the game ",320,70);
+                g.drawString("if u want play arcade press checkbox in settings", 280 ,95);
+                drop_left = 400;
+                drop_top = -200;
+                g.drawImage(win, 345, 120, null);
+                isWin = true;
+                if (s) {
+                    new Sound("win.wav", 0.1f * volume);
+                    s = false;
+                }
+            }
         }
+
         drop_top = drop_top + drop_v * delta_time;
         drop_left = drop_left + drop_vy1 * delta_time;
         g.drawImage(drop, (int) drop_left, (int) drop_top, null);
+
         if (live <= 0) {
             g.drawImage(gameOver, 280, 120, null);
             g.drawString("Game Over! Your score is " + score * SwingApp.i ,340 ,70);
@@ -128,6 +143,7 @@ public class GameWindow extends JFrame {
             drop_vy1 = 0;
             drop_top = -100;
         }
+
         if (drop_top > game_window.getHeight()) {
             live = live - 1;
             new Sound("fail.wav",0.1f*volume);
@@ -161,6 +177,7 @@ public class GameWindow extends JFrame {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void readScore() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(scoreListName))) {
             scoreList = (ArrayList<Integer>) ois.readObject();
@@ -206,11 +223,14 @@ public class GameWindow extends JFrame {
                 }
                 repaint();
         }
+
         protected static void start(GameField game_Field) throws IOException {
             JFrame panel1 = SwingApp.getPanel1();
+
             if (SwingApp.difficulty.equals("hard")&&!SwingApp.isArcade){
                 live =2;
             }
+            isActive = true;
             nextLvl =ImageIO.read((GameWindow.class.getResourceAsStream("nextlvl (1).png")));
             win = ImageIO.read((GameWindow.class.getResourceAsStream("crown.png")));
             backGround = ImageIO.read(GameWindow.class.getResourceAsStream("BackGround.png"));
@@ -218,8 +238,8 @@ public class GameWindow extends JFrame {
             drop = ImageIO.read(GameWindow.class.getResourceAsStream("drop.png"));
             game_window = new GameWindow();
             game_window.setIconImage(drop);
-            isActive = true;
             game_window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
             game_window.addWindowListener(new WindowListener() {
                 @Override
                 public void windowOpened(WindowEvent e) {
@@ -238,10 +258,8 @@ public class GameWindow extends JFrame {
                     panel1.setVisible(true);
                     try {
                         sort();
-                    } catch (FileNotFoundException fileNotFoundException) {
+                    } catch (IOException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
                     }
                     change();
 
@@ -272,6 +290,7 @@ public class GameWindow extends JFrame {
 
                 }
             });
+
             game_window.setLocation(500, 100);
             game_window.setSize(906, 478);
             game_window.setResizable(false);
@@ -301,10 +320,8 @@ public class GameWindow extends JFrame {
                         score = score * SwingApp.i;
                         try {
                             sort();
-                        } catch (FileNotFoundException fileNotFoundException) {
+                        } catch (IOException fileNotFoundException) {
                             fileNotFoundException.printStackTrace();
-                        } catch (IOException ioException) {
-                            ioException.printStackTrace();
                         }
                         change();
                     }
@@ -353,10 +370,8 @@ public class GameWindow extends JFrame {
                         panel1.setVisible(true);
                         try {
                             sort();
-                        } catch (FileNotFoundException fileNotFoundException) {
+                        } catch (IOException fileNotFoundException) {
                             fileNotFoundException.printStackTrace();
-                        } catch (IOException ioException) {
-                            ioException.printStackTrace();
                         }
                         change();
                     }
