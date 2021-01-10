@@ -151,17 +151,20 @@ public class GameWindow extends JFrame {
         return isActive;
     }
 
-    public static void sort() throws FileNotFoundException {
+    public static void sort() throws IOException {
         int a;
         int b;
+        InputStream in = GameWindow.class.getResourceAsStream("/Score.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         ClassLoader classLoader = GameWindow.class.getClassLoader();
-        File file = new File(Objects.requireNonNull(classLoader.getResource("Score.txt")).getFile());
-        Scanner scanner = new Scanner(file);
+        //File file = new File(Objects.requireNonNull(classLoader.getResource("Score.txt")).getFile());
+       // Scanner scanner = new Scanner(file);
         int[] result = new int[10];
         for (int i = 0; i < result.length;i++){
-            result[i] =scanner.nextInt();
+            result[i] = Integer.parseInt(reader.readLine());
+            System.out.println(result[i]);
         }
-        scanner.close();
+        //scanner.close();
         for (int i = 0;i <result.length; i++){
             if (result[i] > score ){
                 continue;
@@ -179,11 +182,14 @@ public class GameWindow extends JFrame {
             }
         }
 
-        PrintWriter pw = new PrintWriter(String.valueOf(file));
+        PrintWriter pw = new PrintWriter(String.valueOf(in));
+        //OutputStream os = GameWindow.class.getResourceAsStream("/Score.txt");
+        //try (BufferedWriter bw = new BufferedWriter()) {
+        //}
         for (int i = 0; i < result.length;i++){
-            pw.println(result[i]);
-        }
+
         pw.close();
+            }
     }
 
 
@@ -233,6 +239,8 @@ public class GameWindow extends JFrame {
                         sort();
                     } catch (FileNotFoundException fileNotFoundException) {
                         fileNotFoundException.printStackTrace();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
                     }
                     change();
 
@@ -294,6 +302,8 @@ public class GameWindow extends JFrame {
                             sort();
                         } catch (FileNotFoundException fileNotFoundException) {
                             fileNotFoundException.printStackTrace();
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
                         }
                         change();
                     }
@@ -344,6 +354,8 @@ public class GameWindow extends JFrame {
                             sort();
                         } catch (FileNotFoundException fileNotFoundException) {
                             fileNotFoundException.printStackTrace();
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
                         }
                         change();
                     }

@@ -1,3 +1,4 @@
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -8,10 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.awt.Color;
+import java.net.URL;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -164,16 +164,16 @@ public class SwingApp extends JFrame {
         tp.replaceSelection(msg);
     }
 
-    private static void showMenuB(Container panel) throws FileNotFoundException {
+    private static void showMenuB(Container panel) throws IOException {
         panel.setLayout(null);
 
         JTextPane textArea = new JTextPane();
         textArea.setBounds(50 ,0,200,250);
 
-        String sb = ("             Best Results \n");
+        String sb = "             Best Results \n";
 
         ClassLoader classLoader = SwingApp.class.getClassLoader();
-        File file = new File(Objects.requireNonNull(classLoader.getResource("Score.txt")).getFile());
+        File file = new File(classLoader.getResource("Score.txt").getFile());
         Scanner scanner = new Scanner(file);
         int[] mass = new  int[10];
         for (int i = 0; i < mass.length;i++){
@@ -228,8 +228,8 @@ public class SwingApp extends JFrame {
         String gameLvl = "            Difficulty \n               " + difficulty;
         String arcade = "        Play arcade?";
         String checkBox = "Show menu while playing";
-        String volume =  "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
-        String volumeBackground = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
+        String volume =  "      Effect volume \n               " + 10*GameWindow.getVolume() + " %";
+        String volumeBackground = " Background volume\n               " + 10*GameWindow.getVolumeBackground() + " %";
         appendToPane(textArea,volume,Color.yellow);
         appendToPane(textArea2,gameLvl,Color.yellow);
         appendToPane(textArea1,volumeBackground,Color.YELLOW);
@@ -291,7 +291,7 @@ public class SwingApp extends JFrame {
         plusButton.addActionListener(e -> {
             if (GameWindow.getVolume() < 10 ){
                 GameWindow.setVolume(GameWindow.getVolume()+1);
-                String volume1 = "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
+                String volume1 = "      Effect volume \n               " + 10*GameWindow.getVolume() + " %";
                 new Sound("zvuk-kapli.wav", 0.1f*GameWindow.getVolume());
                 textArea.setText(volume1);
             }
@@ -299,7 +299,7 @@ public class SwingApp extends JFrame {
         minesButton.addActionListener(e -> {
             if (GameWindow.getVolume() >0 ){
                 GameWindow.setVolume(GameWindow.getVolume()-1);
-                String volume1 = "      Effect volume \n               " + (10*GameWindow.getVolume())+ " %";
+                String volume1 = "      Effect volume \n               " + 10*GameWindow.getVolume() + " %";
                 new Sound("zvuk-kapli.wav", 0.1f*GameWindow.getVolume());
                 textArea.setText(volume1);
             }
@@ -308,7 +308,7 @@ public class SwingApp extends JFrame {
             if (GameWindow.getVolumeBackground() < 10 ){
                 GameWindow.setVolumeBackground(GameWindow.getVolumeBackground()+1);
                 Sound.setVolume1(0.1f*GameWindow.getVolumeBackground());
-                String volumeBackground1 = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
+                String volumeBackground1 = " Background volume\n               " + 10*GameWindow.getVolumeBackground() + " %";
                 textArea1.setText(volumeBackground1);
             }
         });
@@ -316,7 +316,7 @@ public class SwingApp extends JFrame {
             if (GameWindow.getVolumeBackground() >0 ){
                 GameWindow.setVolumeBackground(GameWindow.getVolumeBackground()-1);
                 Sound.setVolume1(0.1f*GameWindow.getVolumeBackground());
-                String volumeBackground1 = " Background volume\n               " + (10*GameWindow.getVolumeBackground())+ " %";
+                String volumeBackground1 = " Background volume\n               " + 10*GameWindow.getVolumeBackground() + " %";
                 textArea1.setText(volumeBackground1);
             }
         });
@@ -353,7 +353,7 @@ public class SwingApp extends JFrame {
 
         JTextPane textPane = new JTextPane();
         textPane.setBounds(50 ,0,200,250);
-        String s = ("\n\n              Created by: \n \n             Lordomarian \n\n \n\n \n\n\n                (с) 2020");
+        String s = "\n\n              Created by: \n \n             Lordomarian \n\n \n\n \n\n\n                (с) 2020";
 
         panel.add(textPane);
         Font font = new Font("Vardana",Font.BOLD,15);

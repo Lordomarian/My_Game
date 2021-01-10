@@ -10,7 +10,7 @@ public class Sound implements AutoCloseable {
     private boolean playing = false;
     private static FloatControl volumeControl = null;
 
-    public  Sound  (String name, float x) {
+    public Sound (String name, float x){
         try {
             URL defaultSound = this.getClass().getResource(name);
             AudioInputStream ais = AudioSystem.getAudioInputStream(defaultSound);
